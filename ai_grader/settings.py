@@ -158,6 +158,8 @@ UPLOAD_DIRECTORY = os.path.join(BASE_DIR, 'uploads')
 GRADER_DIRECTORY = os.path.join(BASE_DIR, 'scripts')
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL = '/static/'
 
 try:
     from .secret import *  # noqa
