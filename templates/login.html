@@ -8,18 +8,31 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="/">AI Grader</a>
-        <ul class="navbar-nav"></ul>
-        {% if request.user.is_authenticated %}
-        {% if request.user.is_superuser %}
-        <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin Page</a></li>
-        {% endif %}
-        <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Log Out ({{ request.user.username }})</a></li>
-        {% else %}
-        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Log In</a></li>
-        {% endif %}
-        </ul>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav"
+            aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+
+            <ul class="navbar-nav">
+                {% if request.user.is_authenticated %}
+                {% if request.user.is_superuser %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'admin:index' %}">Admin Page</a>
+                </li>
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">Log Out ({{ request.user.username }})</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}">Log In</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
     </nav>
     <div class="container">
         <div class="row" style="margin-top: 1rem;">
