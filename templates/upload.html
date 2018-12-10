@@ -60,7 +60,11 @@
             {% for submission in submissions %}
             <tr>
                 <strong>Submission for {{ submission.lab }} at {{ submission.upload_time }}</strong>
-                <pre>{{ submission.output.strip }}</pre>
+                {% if submission.output|slice:"1" == "<" %} {{ submission.output.strip | safe }} {% comment %}>
+                    {% endcomment %}
+                    {% else %}
+                    <pre>{{submission.output.strip}}</pre>
+                    {% endif %}
             </tr>
             {% endfor %}
         </table>
