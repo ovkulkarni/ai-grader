@@ -1,0 +1,37 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+
+<body>
+    <nav class="navbar navbar-light bg-light">
+        <a class="navbar-brand" href="/">AI Grader</a>
+        <ul class="navbar-nav"></ul>
+        {% if request.user.is_authenticated %}
+        {% if request.user.is_superuser %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin Page</a></li>
+        {% endif %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Log Out ({{ request.user.username }})</a></li>
+        {% else %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Log In</a></li>
+        {% endif %}
+        </ul>
+    </nav>
+    <div class="container">
+        <div class="row" style="margin-top: 1rem;">
+            <div class="col align-self-center text-center">
+                <p><b>Log in with your Intranet account</b> to access the AI Grader.</p>
+                <a href="{% url 'social:begin' 'ion' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}"
+                    class="btn btn-outline-primary" role="button">
+                    Log In with Ion
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
