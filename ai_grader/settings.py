@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -155,6 +156,8 @@ LOGIN_ERROR_URL = '/login/'
 
 UPLOAD_DIRECTORY = os.path.join(BASE_DIR, 'uploads')
 GRADER_DIRECTORY = os.path.join(BASE_DIR, 'scripts')
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 try:
     from .secret import *  # noqa

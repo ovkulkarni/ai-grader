@@ -9,6 +9,7 @@ verify_ssl = true
 django = "*"
 social-auth-app-django = "*"
 dj-database-url = "*"
+whitenoise = "*"
 
 [requires]
 python_version = "3.6"
