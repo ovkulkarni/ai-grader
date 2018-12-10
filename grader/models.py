@@ -34,10 +34,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Lab(models.Model):
     name = models.CharField(max_length=256)
     grader_filename = models.CharField(max_length=256)
-    description = models.CharField(max_length=4096)
+    short_description = models.CharField(max_length=4096)
+    detailed_description = models.TextField(blank=True)
 
     def __str__(self):
-        return self.name
+        return "{} - {}".format(self.name, self.short_description)
 
 
 def upload_directory(instance, filename=None):
