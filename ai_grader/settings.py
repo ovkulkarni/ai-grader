@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import dj_database_url
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -159,3 +160,6 @@ try:
     from .secret import *  # noqa
 except ImportError:
     pass
+
+if os.getenv("DATABASE_URL"):
+    DATABASES['default'] = dj_database_url.parse(os.getenv("DATABASE_URL"))
