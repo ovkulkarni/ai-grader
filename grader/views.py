@@ -1,15 +1,15 @@
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.conf import settings
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from django.http import Http404, JsonResponse, HttpResponse
+from django.contrib import messages
 
 from .forms import SubmissionForm
+from .models import Submission, Lab
+from .tasks import run_code
 
-from os.path import join
-from subprocess import check_output, STDOUT, CalledProcessError
 import tempfile
-import traceback
 
 # Create your views here.
 
@@ -35,22 +35,38 @@ def upload_view(request):
         submission = form.save(commit=False)
         submission.user = request.user
         submission.save()
-        try:
-            status = check_output("python3 {} {}".format(
-                join(settings.GRADER_DIRECTORY,
-                     submission.lab.grader_filename),
-                submission.code).split(), stderr=STDOUT).decode()
-            submission.output = status
-        except CalledProcessError as e:
-            submission.output = str(e.output)
-        except Exception:
-            submission.output = traceback.format_exc()
-        submission.save()
-        return redirect("index")
+        run_code.delay(submission.pk)
+        submissions = request.user.submission_set.all().order_by(
+            '-upload_time')
+        form.fields['code'].required = False
+        messages.success(
+            request, "Successfully submitted lab for grading! Please check below for the grader's output.")
+        return render(request, "upload.html", {'form': form,
+                                               'submissions': submissions,
+                                               'inp':
+                                               request.POST['code_input']
+                                               })
     form = SubmissionForm()
     form.fields['code'].required = False
     return render(request, "upload.html", {'form': form,
                                            'submissions': submissions})
+
+
+@login_required
+def get_description_view(request):
+    if request.GET.get('id', '').isdigit():
+        lab = get_object_or_404(Lab, id=int(request.GET.get('id')))
+        return HttpResponse(lab.detailed_description)
+    raise Http404
+
+
+@login_required
+def view_submission_output(request, pk):
+    submission = get_object_or_404(Submission, pk=pk)
+    if submission.user != request.user and not request.user.is_superuser:
+        raise Http404
+    deets = {'complete': submission.complete, 'output': submission.output}
+    return JsonResponse(deets)
 
 
 def login_view(request):

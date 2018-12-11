@@ -10,6 +10,10 @@ django = "*"
 social-auth-app-django = "*"
 dj-database-url = "*"
 whitenoise = "*"
+gevent = "*"
+celery = "*"
+gunicorn = "*"
+django-celery-results = "*"
 
 [requires]
 python_version = "3.6"

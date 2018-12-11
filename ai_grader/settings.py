@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'social_django',
     'grader',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -160,6 +161,8 @@ GRADER_DIRECTORY = os.path.join(BASE_DIR, 'scripts')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
+CELERY_BROKER_URL = 'pyamqp://ai_grader:ai_grader@localhost/ai_grader'
+CELERY_RESULT_BACKEND = 'django-db'
 
 try:
     from .secret import *  # noqa

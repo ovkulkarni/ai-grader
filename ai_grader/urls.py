@@ -15,11 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from grader.views import upload_view, login_view, logout_view
+from grader.views import (upload_view, login_view,
+                          logout_view, view_submission_output, get_description_view)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', upload_view, name="index"),
+    path('description/', get_description_view, name="description"),
+    path('output/<int:pk>', view_submission_output,
+         name="view_submission_output"),
     path('login/', login_view, name="login"),
     path('logout/', logout_view, name="logout"),
     path('', include('social_django.urls', namespace='social'))

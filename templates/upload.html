@@ -6,6 +6,37 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/css/selectize.min.css" />
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <style>
+        .complete {
+            display: none;
+        }
+        @keyframes blink {
+            0% {
+            opacity: .2;
+            }
+            20% {
+            opacity: 1;
+            }
+            100% {
+            opacity: .2;
+            }
+        }
+        .loading span {
+            animation-name: blink;
+            animation-duration: 1.4s;
+            animation-iteration-count: infinite;
+            animation-fill-mode: both;
+            font-size: 3rem;
+            line-height: 1px;
+        }
+        .loading span:nth-child(2) {
+            animation-delay: .2s;
+        }
+
+        .loading span:nth-child(3) {
+            animation-delay: .4s;
+        }
+    </style>
 </head>
 
 <body>
@@ -36,60 +67,114 @@
         </div>
     </nav>
     <div class="container">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
         <div class="row" style="margin-top: 1rem;">
             <form class="col-12" action="/" method="post" enctype="multipart/form-data">
                 <div class="row">
                     {% csrf_token %}
                     <div class="col-6">
                         {{ form.as_p }}
+                        <p id="description"></p>
                     </div>
                     <div class="col-6">
                         <div class="row">
                             <div style="height: 50%" class="col-12" name="code_input" id="editor"></div>
-                            <textarea class="d-none" name="code_input"></textarea>
+                            <textarea class="d-none" name="code_input">{{ inp }}</textarea>
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <input class="btn btn-success" type="submit" value="Submit">
-                </div>
+                <input class="btn btn-success" type="submit" value="Submit">
             </form>
         </div>
 
         <table>
             {% for submission in submissions %}
             <tr>
-                <strong>Submission for {{ submission.lab }} at {{ submission.upload_time }}</strong>
-                {% if submission.output|slice:"1" == "<" %} {{ submission.output.strip | safe }} {% comment %}>
-                    {% endcomment %}
-                    {% else %}
-                    <pre>{{submission.output.strip}}</pre>
-                    {% endif %}
+                <strong>
+                    <i class="text-success {% if not submission.complete %}in{% endif %}complete" data-endpoint="{% url 'view_submission_output' submission.pk %}">
+                        In Progress:
+                    </i>
+                    Submission for {{ submission.lab }} at {{ submission.upload_time }}
+                </strong>
+                <div id="result_{{ submission.pk }}"> {% if submission.output|slice:"1" == "<" %}
+                        {{ submission.output.strip | safe }} {% comment %}>
+                        {% endcomment %}
+                        {% else %}
+                        <pre>{{submission.output.strip}}</pre>
+                        {% endif %}
+                </div>
+                {% if not submission.complete %}
+                <p id="loading_{{ submission.pk }}" class="loading"><span>.</span><span>.</span><span>.</span></p>
+                {% endif %}
             </tr>
             {% endfor %}
         </table>
     </div>
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
         crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.6/js/standalone/selectize.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.2/ace.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.2/ext-language_tools.js"></script>
     <script type="text/javascript">
         $('#id_lab').selectize({
             create: true,
-            sortField: 'text'
+            sortField: 'text',
+            onChange: function (value) {
+                $.get("{% url 'description' %}?id=" + value, function (res) {
+                    $("#description").html(res);
+                });
+            }
         });
     </script>
     <script>
+        ace.require("ace/ext/language_tools");
         var editor = ace.edit("editor");
         editor.setTheme("ace/theme/tomorrow");
         editor.session.setMode("ace/mode/python");
+        editor.setOptions({
+            enableBasicAutocompletion: true,
+            enableSnippets: true,
+            enableLiveAutocompletion: true
+        });
         var textarea = $('textarea[name="code_input"]');
         editor.getSession().on("change", function () {
             textarea.val(editor.getSession().getValue());
+        });
+        $(document).ready(function () {
+            editor.getSession().setValue($('textarea[name="code_input"]').val(), 1);
+        });
+    </script>
+    <script>
+        function getData() {
+            $('.incomplete').each(function (i, obj) {
+                var $obj = $(obj)
+                var pk = $obj.data('endpoint').split("/")[2];
+                $.get($obj.data('endpoint'), function (res) {
+                    if (res.complete) {
+                        $obj.removeClass('incomplete');
+                        $obj.addClass('complete');
+                        $("#loading_" + pk).addClass('complete');
+                    }
+                    if (res.output.startsWith('<')) {
+                        $('#result_' + pk).html(res);
+                    }
+                    else {
+                        $("#result_" + pk).html("<pre>" + res.output + "</pre>");
+                    }
+                });
+            });
+        }
+        $(document).ready(function () {
+            setInterval(getData, 3000);
         });
     </script>
 </body>
