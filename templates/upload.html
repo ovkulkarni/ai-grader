@@ -94,7 +94,7 @@
                     {% csrf_token %}
                     <div class="col-6">
                         {{ form.as_p }}
-                        <div id="descriptionContainer" {% if not description %}style="display: none" {% endif %}>
+                        <div id="descriptionContainer" style="display: none">
                             <p><button id="collapseButton" class="btn btn-primary" type="button" data-toggle="collapse"
                                     data-target="#descriptionCollapse" aria-expanded="false" aria-controls="descriptionCollapse">
                                     Toggle description
@@ -102,7 +102,7 @@
                             <p>
                                 <div class="collapse show" id="descriptionCollapse">
                                     <div class="card card-body">
-                                        <pre id="description">{{ description }}</pre>
+                                        <pre id="description"></pre>
                                     </div>
                                 </div>
                             </p>
@@ -151,6 +151,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.2/ace.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.2/ext-language_tools.js"></script>
     <script type="text/javascript">
+        $(document).ready(function () {
+            $.get("{% url 'description' %}?id=" + $("#id_lab").val(), function (res) {
+                $("#description").html(res);
+                $("#descriptionContainer").slideDown();
+            });
+        })
         $('#id_lab').selectize({
             create: true,
             sortField: 'text',
