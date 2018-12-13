@@ -94,19 +94,14 @@
                     {% csrf_token %}
                     <div class="col-6">
                         {{ form.as_p }}
-                        <div id="descriptionContainer" style="display: none">
-                            <p><button id="collapseButton" class="btn btn-primary" type="button" data-toggle="collapse"
-                                    data-target="#descriptionCollapse" aria-expanded="false" aria-controls="descriptionCollapse">
-                                    Toggle description
-                                </button></p>
-                            <p>
-                                <div class="collapse show" id="descriptionCollapse">
-                                    <div class="card card-body">
-                                        <pre id="description"></pre>
-                                    </div>
+                        <p>
+                            <div id="descriptionContainer" style="display: none">
+                                <div>
+                                    <p>[<a data-toggle="tooltip" title="Toggle Description" id="collapseButton" href="">+</a>]</p>
+                                    <pre id="description"></pre>
                                 </div>
-                            </p>
-                        </div>
+                            </div>
+                        </p>
                     </div>
                     <div class="col-6">
                         <div class="row">
@@ -152,17 +147,30 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.2/ext-language_tools.js"></script>
     <script type="text/javascript">
         $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
             $.get("{% url 'description' %}?id=" + $("#id_lab").val(), function (res) {
                 $("#description").html(res);
+                $("#description").slideUp();
                 $("#descriptionContainer").slideDown();
             });
-        })
+            $("#collapseButton").click(function (e) {
+                e.preventDefault();
+                if ($(this).text().trim() === "+") {
+                    $("#description").slideDown();
+                    $(this).text("-");
+                } else {
+                    $("#description").slideUp();
+                    $(this).text("+");
+                }
+            });
+        });
         $('#id_lab').selectize({
             create: true,
             sortField: 'text',
             onChange: function (value) {
                 $.get("{% url 'description' %}?id=" + value, function (res) {
                     $("#description").html(res);
+                    $("#description").slideUp();
                     $("#descriptionContainer").slideDown();
                 });
             }

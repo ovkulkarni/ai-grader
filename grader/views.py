@@ -43,8 +43,7 @@ def upload_view(request):
             request, "Successfully submitted lab for grading! Please check below for the grader's output.")
         return render(request, "upload.html", {'form': form,
                                                'submissions': submissions,
-                                               'inp': request.POST['code_input'],
-                                               'description': submission.lab.detailed_description
+                                               'inp': request.POST['code_input']
                                                })
     form = SubmissionForm()
     form.fields['code'].required = False
