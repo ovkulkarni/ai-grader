@@ -41,9 +41,11 @@ INSTALLED_APPS = [
     'social_django',
     'grader',
     'django_celery_results',
+    'useraudit',
 ]
 
 MIDDLEWARE = [
+    'useraudit.middleware.RequestToThreadLocalMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
