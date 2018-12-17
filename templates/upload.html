@@ -94,6 +94,7 @@
                     {% csrf_token %}
                     <div class="col-6">
                         {{ form.as_p }}
+                        <input class="btn btn-success" type="submit" value="Submit">
                         <p>
                             <div id="descriptionContainer" style="display: none">
                                 <div>
@@ -110,7 +111,6 @@
                         </div>
                     </div>
                 </div>
-                <input class="btn btn-success" type="submit" value="Submit">
             </form>
         </div>
 
@@ -123,11 +123,16 @@
                     </i>
                     Submission for {{ submission.lab }} at {{ submission.upload_time }}
                 </strong>
-                <div id="result_{{ submission.pk }}"> {% if submission.output|slice:"1" == "<" %}
-                        {{ submission.output.strip | safe }} {% comment %}>
+                {% if forloop.counter > 5 and submission.complete %}<p>[<a href="#" data-endpoint="{% url 'view_submission_output' submission.pk %}"
+                        class="hidden">Show Output</a>]</p>
+                {% endif %}
+                <div id="result_{{ submission.pk }}">
+                    {% if not forloop.counter > 5 or not submission.complete %}
+                    {% if submission.output|slice:"1" == "<" %} {{ submission.output.strip | safe }} {% comment %}>
                         {% endcomment %}
                         {% else %}
-                        <pre>{{submission.output.strip}}</pre>
+                        <pre>{{ submission.output.strip }}</pre>
+                        {% endif %}
                         {% endif %}
                 </div>
                 {% if not submission.complete %}
@@ -161,6 +166,27 @@
                 } else {
                     $("#description").slideUp();
                     $(this).text("+");
+                }
+            });
+            $(".hidden").click(function (e) {
+                e.preventDefault();
+                var $obj = $(this);
+                var pk = $obj.data('endpoint').split("/")[2];
+                $("#result_" + pk).slideUp();
+                if ($obj.text().trim().startsWith("Show")) {
+                    $.get($obj.data('endpoint'), function (res) {
+                        if (res.output.startsWith('<')) {
+                            $('#result_' + pk).html(res.output);
+                        }
+                        else {
+                            $("#result_" + pk).html("<pre>" + res.output + "</pre>");
+                        }
+                        $("#result_" + pk).slideDown();
+                        $obj.text("Hide Output");
+                    });
+                } else {
+                    $("#result_" + pk).slideUp();
+                    $obj.text("Show Output");
                 }
             });
         });
@@ -206,7 +232,7 @@
                         $("#loading_" + pk).addClass('complete');
                     }
                     if (res.output.startsWith('<')) {
-                        $('#result_' + pk).html(res);
+                        $('#result_' + pk).html(res.output);
                     }
                     else {
                         $("#result_" + pk).html("<pre>" + res.output + "</pre>");
