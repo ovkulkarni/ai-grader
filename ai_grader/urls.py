@@ -15,12 +15,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from grader.views import (upload_view, login_view,
+from grader.views import (upload_view, login_view, about_view,
                           logout_view, view_submission_output, get_description_view)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', upload_view, name="index"),
+    path('', about_view, name="index"),
+    path('upload/', upload_view, name="upload"),
     path('description/', get_description_view, name="description"),
     path('output/<int:pk>', view_submission_output,
          name="view_submission_output"),

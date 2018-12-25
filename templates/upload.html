@@ -7,35 +7,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>AI Grader - Upload</title>
-    <style>
+    <style type="text/css">
         .complete {
             display: none;
-        }
-        @keyframes blink {
-            0% {
-            opacity: .2;
-            }
-            20% {
-            opacity: 1;
-            }
-            100% {
-            opacity: .2;
-            }
-        }
-        .loading span {
-            animation-name: blink;
-            animation-duration: 1.4s;
-            animation-iteration-count: infinite;
-            animation-fill-mode: both;
-            font-size: 3rem;
-            line-height: 1px;
-        }
-        .loading span:nth-child(2) {
-            animation-delay: .2s;
-        }
-
-        .loading span:nth-child(3) {
-            animation-delay: .4s;
         }
         pre {
             white-space: pre-wrap;       /* Since CSS 2.1 */
@@ -49,14 +23,16 @@
 
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="/">AI Grader</a>
+        <a class="navbar-brand" href="{% url 'index' %}">AI Grader</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav"
             aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-
             <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'upload' %}">Upload</a>
+                </li>
                 {% if request.user.is_authenticated %}
                 {% if request.user.is_superuser %}
                 <li class="nav-item">
@@ -80,7 +56,7 @@
     <div class="container">
         {% if messages %}
         {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show my-2" role="alert">
             {{ message }}
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
@@ -88,13 +64,16 @@
         </div>
         {% endfor %}
         {% endif %}
-        <div class="row" style="margin-top: 1rem;">
-            <form class="col-12" action="/" method="post" enctype="multipart/form-data">
+        <div class="row mt-4">
+            <form class="col-12" action="{% url 'upload' %}" method="post" enctype="multipart/form-data">
                 <div class="row">
                     {% csrf_token %}
                     <div class="col-6">
                         {{ form.as_p }}
                         <input class="btn btn-success" type="submit" value="Submit">
+                        <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#exampleModalCenter">
+                        Help
+                        </button>
                         <p>
                             <div id="descriptionContainer" style="display: none">
                                 <div>
@@ -106,13 +85,14 @@
                     </div>
                     <div class="col-6">
                         <div class="row">
-                            <div style="height: 50%" class="col-12" name="code_input" id="editor"></div>
+                            <div style="height: 20rem" class="col-12" name="code_input" id="editor"></div>
                             <textarea class="d-none" name="code_input">{{ inp }}</textarea>
                         </div>
                     </div>
                 </div>
             </form>
         </div>
+        {% include "help.html" %}
 
         <table>
             {% for submission in submissions %}
@@ -128,15 +108,17 @@
                 {% endif %}
                 <div id="result_{{ submission.pk }}">
                     {% if not forloop.counter > 5 or not submission.complete %}
-                    {% if submission.output|slice:"1" == "<" %} {{ submission.output.strip | safe }} {% comment %}>
-                        {% endcomment %}
+                        {% if submission.output|slice:"1" == "<" %}
+                        {{ submission.output.strip | safe }}
                         {% else %}
                         <pre>{{ submission.output.strip }}</pre>
                         {% endif %}
-                        {% endif %}
+                    {% endif %}
                 </div>
                 {% if not submission.complete %}
-                <p id="loading_{{ submission.pk }}" class="loading"><span>.</span><span>.</span><span>.</span></p>
+                <div id="loading_{{ submission.pk }}" class="progress">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+                </div>
                 {% endif %}
             </tr>
             {% endfor %}
@@ -209,7 +191,7 @@
         editor.session.setMode("ace/mode/python");
         editor.setOptions({
             enableBasicAutocompletion: true,
-            enableSnippets: true,
+            enableSnippets: false,
             enableLiveAutocompletion: true
         });
         var textarea = $('textarea[name="code_input"]');

@@ -75,3 +75,7 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect("index")
+
+
+def about_view(request):
+    return render(request, "about.html", {})

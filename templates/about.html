@@ -1,0 +1,180 @@
+{% load static %}
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>AI Grader</title>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="{% url 'index' %}">AI Grader</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav"
+            aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'upload' %}">Upload</a>
+                </li>
+                {% if request.user.is_authenticated %}
+                {% if request.user.is_superuser %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'admin:index' %}">Admin Page</a>
+                </li>
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">Log Out ({{ request.user.username }})</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}">Log In</a>
+                </li>
+                {% endif %}
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><small>Developed by Omkar Kulkarni (2019)</small></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="row" style="margin-top: 1rem;">
+            <div class="col">
+                <div class="jumbotron">
+                    <h2 class="display-4">Welcome to the TJHSST AI Grader!</h2>
+                    <p class="lead">This website is used to run automated grader scripts for the Artificial Intelligence class at TJHSST.</p>
+                    <hr class="my-4">
+                    <div id="accordion">
+                        <div class="card">
+                            <div class="card-header" id="headingOne">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                Why is this website useful?
+                                </button>
+                            </h5>
+                            </div>
+
+                            <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                            <div class="card-body">
+                                <p>
+                                    Before this application was created, users had to upload their code into a special directory on TJHSST servers and wait 
+                                    for the teacher to run the grading scripts before receiving feedback. Now, students can enter their code directly into this site 
+                                    and the grader script's output is shown for instant feedback. Students can get their code graded concurrently, which reduces wait 
+                                    times and allows the teacher to keep track of new code and update grades accordingly without having to manually execute the 
+                                    grader on recently uploaded files. Additionally, students possess a log of all previous submission outputs for future reference.
+                                </p>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header" id="headingTwo">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                What's special about this site?
+                                </button>
+                            </h5>
+                            </div>
+                            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                            <div class="card-body">
+                                <h6 class="heading-6">Web Editor</h6>
+                                <p>This website provides a web editor with code completion and syntax highlighting, which makes it simple for students to quickly
+                                resolve syntax errors in their code before resubmitting for grading. Since there is also the option to upload files, students
+                                can use the editor of their choice to modify their code before uploading it onto the server for grading.</p>
+                                <h6 class="heading-6">Concurrent and Asynchronous Grading</h6>
+                                <p>This website uses <a href="http://www.celeryproject.org/" target="_blank" rel="noopener noreferrer">Celery</a> workers to execute
+                                the grading scripts. There are eight workers who are assigned to pick up jobs from the queue, which means eight graders can be run at
+                                the same time. If there are more than 8 students who submit their code for grading, their code is placed at the end of the queue 
+                                to be handled by workers as soon as the workers are finished with their previous jobs. Since the workers are running asynchronously, 
+                                output is shown to the students as it becomes available, which lets students view their progress for longer running jobs (e.g. >5 min) 
+                                without having to wait until the grader is finished running.</p>
+                                <h6 class="heading-6">Ease of Use</h6>
+                                <p>This website was created with the goal of not just improving the grading experience for both students and teachers. With the
+                                combination of the web editor and live output, the website makes it simple for students to get their code graded whenever 
+                                they want. For teachers, the website ensures they don't have to run the script on all the students' code at once and wait for it 
+                                to complete, which can take hours. Additionally, teachers have a simple web interface they can use to create new labs for grading. 
+                                Below is a screenshot of the admin interface where teachers can create new labs for students to view and submit.</p>
+                                <p><img src="{% static 'admin.png' %}" class="img-fluid img-thumbnail" alt="Admin page" /></p>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header" id="headingThree">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                Can I see it in action?
+                                </button>
+                            </h5>
+                            </div>
+                            <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+                            <div class="card-body">
+                                <p>
+                                Sure! If this is your first time using the application, you should try submitting to <code>Sample Lab</code>. 
+                                You can expand the description to find out more about what the grader script for that specific lab does. For your convenience, there are 
+                                more instructions on how to submit on the upload page. Additionally, there are videos and screenshots of the grader in action attached below.
+                                </p>
+                                <div class="row">
+                                    <div class="col-sm-12 col-xs-12">
+                                        <figure class="figure">
+                                            <figcaption class="figure-caption">Syntax highlighting in the code editor.</figcaption>
+                                            <img src="{% static 'syntax.png' %}" class="figure-img img-fluid img-thumbnail" alt="Syntax highlighting in the code editor.">
+                                            
+                                        </figure>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12 col-xs-12">
+                                        <figcaption class="figure-caption">Submitting a file.</figcaption>
+                                        <div class="embed-responsive embed-responsive-16by9">
+                                            <video class="embed-responsive-item" src="{% static 'submission.mp4' %}" playsinline autoplay muted loop controls></video>
+                                        </div>
+                                        
+                                    </div>
+                                    <div class="col-sm-12 col-xs-12">
+                                        <figcaption class="figure-caption">Adding jobs to the queue.</figcaption>
+                                        <div class="embed-responsive embed-responsive-16by9">
+                                            <video class="embed-responsive-item" src="{% static 'concurrent.mp4' %}" playsinline autoplay muted loop controls></video>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12 col-xs-12">
+                                        <figcaption class="figure-caption">Toggling the description.</figcaption>
+                                        <div class="embed-responsive embed-responsive-16by9">
+                                            <video class="embed-responsive-item" src="{% static 'description.mp4' %}" playsinline autoplay muted loop controls></video>
+                                        </div>
+                                        
+                                    </div>
+                                    <div class="col-sm-12 col-xs-12">
+                                        <figcaption class="figure-caption">Showing and hiding the output.</figcaption>
+                                        <div class="embed-responsive embed-responsive-16by9">
+                                            <video class="embed-responsive-item" src="{% static 'output.mp4' %}" playsinline autoplay muted loop controls></video>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="lead mt-4">
+                        <a class="btn btn-primary btn-lg" href="{% url 'upload' %}" role="button">Get started!</a>
+                    </p>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

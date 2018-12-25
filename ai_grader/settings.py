@@ -154,13 +154,16 @@ SOCIAL_AUTH_USER_FIELDS = ['username', 'first_name',
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
 
 LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/upload/'
 LOGIN_ERROR_URL = '/login/'
 
 UPLOAD_DIRECTORY = os.path.join(BASE_DIR, 'uploads')
 GRADER_DIRECTORY = os.path.join(BASE_DIR, 'scripts')
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static_files'),
+)
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 CELERY_BROKER_URL = 'pyamqp://ai_grader:ai_grader@localhost/ai_grader'
