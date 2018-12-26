@@ -169,6 +169,10 @@ STATIC_URL = '/static/'
 CELERY_BROKER_URL = 'pyamqp://ai_grader:ai_grader@localhost/ai_grader'
 CELERY_RESULT_BACKEND = 'django-db'
 
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_AGE = 60 * 60 * 24
+
 try:
     from .secret import *  # noqa
 except ImportError:
