@@ -54,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'middleware.access_log.AccessLogMiddleware',
 ]
 
 ROOT_URLCONF = 'ai_grader.urls'
@@ -107,6 +108,32 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',  # noqa
     },
 ]
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'bare': {
+            'format': '%(message)s',
+        },
+    },
+    'handlers': {
+        'file': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'access.log'),
+            'maxBytes': 100 * 100 * 100,
+            'backupCount': 10,
+            'formatter': 'bare'
+        },
+    },
+    'loggers': {
+        'grader_access': {
+            'level': 'INFO',
+            'handlers': ['file'],
+            'propagate': False,
+        },
+    },
+}
 
 
 # Internationalization

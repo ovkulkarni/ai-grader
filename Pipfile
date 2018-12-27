@@ -15,6 +15,7 @@ celery = "*"
 gunicorn = "*"
 django-celery-results = "*"
 django-useraudit = "*"
+django-ipware = "*"
 
 [requires]
 python_version = "3.6"

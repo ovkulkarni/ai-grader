@@ -3,6 +3,7 @@
 secret.py
 static
 scripts
+logs
 uploads
 **.pid
 **.db
