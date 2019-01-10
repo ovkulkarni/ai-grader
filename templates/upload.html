@@ -14,6 +14,7 @@
       gtag('js', new Date());
 
       gtag('config', 'UA-131841582-1');
+      gtag('set', {'user_id': '{{ request.user.username | default:"anonymous" }}'}); 
     </script>
     <title>AI Grader - Upload</title>
     <style type="text/css">
