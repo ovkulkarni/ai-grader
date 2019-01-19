@@ -29,7 +29,7 @@ def run_code(sub_pk):
                 output=proc.stdout,
                 stderr=proc.stderr)
     except CalledProcessError as e:
-        submission.output = str(e.output)
+        submission.output = e.output.read().decode()
     except Exception:
         submission.output = traceback.format_exc()
     submission.complete = True
