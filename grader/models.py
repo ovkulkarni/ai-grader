@@ -40,6 +40,9 @@ class Lab(models.Model):
     def __str__(self):
         return "{} - {}".format(self.name, self.short_description)
 
+    class Meta:
+        ordering = ['-id']
+
 
 def upload_directory(instance, filename=None):
     return os.path.join(settings.UPLOAD_DIRECTORY,

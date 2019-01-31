@@ -184,7 +184,6 @@
         });
         $('#id_lab').selectize({
             create: true,
-            sortField: [{field: 'value', direction: 'desc'}],
             onChange: function (value) {
                 $.get("{% url 'description' %}?id=" + value, function (res) {
                     $("#description").html(res);
