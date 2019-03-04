@@ -26,10 +26,10 @@ def run_code(sub_pk):
         if proc.returncode != 0:
             raise CalledProcessError(
                 proc.returncode, proc.args,
-                output=proc.stdout,
-                stderr=proc.stderr)
+                output=(b"" if proc.stdout.closed else proc.stdout.read()),
+                stderr=None)
     except CalledProcessError as e:
-        submission.output = e.output.read().decode()
+        submission.output = e.output.decode()
     except Exception:
         submission.output = traceback.format_exc()
     submission.complete = True
