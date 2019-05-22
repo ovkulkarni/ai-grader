@@ -57,7 +57,7 @@ class Submission(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     upload_time = models.DateTimeField(auto_now_add=True)
     code = models.FileField(upload_to=upload_directory)
-    output = models.CharField(max_length=4096 * 16)
+    output = models.CharField(max_length=4096 * 16 * 16)
     complete = models.BooleanField(default=False)
 
     def __str__(self):
